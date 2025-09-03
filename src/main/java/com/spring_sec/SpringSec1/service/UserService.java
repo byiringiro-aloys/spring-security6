@@ -8,19 +8,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtService jwtService,
                        AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
     }
 
@@ -35,7 +36,7 @@ public class UserService {
                 new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword())
         );
         if(authenticate.isAuthenticated())
-            return "login successful 😘";
+            return jwtService.generateToken(user);
         return "Username or password is invalid";
     }
 }
